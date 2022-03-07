@@ -1,7 +1,7 @@
 import asyncio
 import platform
 
-from . import coins, pairs
+from . import coins, pairs, networks
 from .api import ApiError, ApiProvider
 from .market import Exchange
 from .private import Account
@@ -11,6 +11,7 @@ from .structs import (
     Deposit,
     DepositStatus,
     MarketTrade,
+    Network,
     Order,
     OrderSide,
     OrderStatus,
@@ -38,6 +39,8 @@ __all__ = [
     "Period",
     "Candle",
     "MarketTrade",
+    "networks",
+    "Network",
     "PrivateTrade",
     "Timeframe",
     "Deposit",
