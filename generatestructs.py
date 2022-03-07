@@ -20,6 +20,7 @@ async def main():
     for pair in pairs:
         coins.add(pair.base_coin)
         coins.add(pair.quote_coin)
+    networks = await account.get_currency_networks()
 
     with (SRC_PATH / "pairs.py").open("w") as f:
         f.writelines(
@@ -46,6 +47,17 @@ async def main():
             ]
             + ["\n", ALL_TEMPLATE.format("Coin")]
         )
+
+    with (SRC_PATH / 'networks.py').open('w') as f:
+        f.writelines([
+            "from .structs import Network\n\n",
+        ] + [
+            f'{network.name}_NETWORK = Network("{network.exchange_name}")\n'
+            for network in sorted(networks, key=lambda c: c.name)
+        ] + [
+            "\n",
+            ALL_TEMPLATE.format(class_name='Network')
+        ])
 
 
 if __name__ == "__main__":
