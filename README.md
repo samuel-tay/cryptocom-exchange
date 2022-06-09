@@ -1,7 +1,7 @@
-# Python 3.7+ library for crypto.com/exchange API using asyncio and aiohttp 
+# Python 3.7+ async library for crypto.com/exchange API using httpx and websockets
 
 [![Docs Build Status](https://readthedocs.org/projects/cryptocom-exchange/badge/?version=latest&style=flat)](https://readthedocs.org/projects/cryptocom-exchange)
-[![Build Status](https://dev.azure.com/mortyspace/goincrypto/_apis/build/status/goincrypto.cryptocom-exchange?branchName=master)](https://dev.azure.com/mortyspace/goincrypto/_build/latest?definitionId=1&branchName=master)
+![Test workflow](https://github.com/goincrypto/cryptocom-exchange/actions/workflows/test.yml/badge.svg)
 [![Maintainability](https://api.codeclimate.com/v1/badges/8d7ffdae54f3c6e86b5a/maintainability)](https://codeclimate.com/github/goincrypto/cryptocom-exchange/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/8d7ffdae54f3c6e86b5a/test_coverage)](https://codeclimate.com/github/goincrypto/cryptocom-exchange/test_coverage)
 [![PyPI implementation](https://img.shields.io/pypi/implementation/cryptocom-exchange.svg)](https://pypi.python.org/pypi/cryptocom-exchange/)
@@ -29,6 +29,7 @@ Exchange original API docs: [https://exchange-docs.crypto.com](https://exchange-
 
 ### Changelog
 
+- **0.10.4** - Updated pairs
 - **0.10.3** - fixed websocket private endpoints not returning data
 - **0.10.2** - fixed huge memory leak by `httpx`
 - [leaks memory] **0.10.1** - added read timeouts for websockets, fixed test with tickers
@@ -73,21 +74,3 @@ keys for tests passing
 - **0.3** - added websocket support for public endpoints and supports `sign=True` for private endpoints
 - **0.2.1** - fixed order_id in `get_order` func, still preparing for stable release
 - **0.2** - moved to new API v2, except for websockets
-
-### TODO
-- Sync pairs automatically
-- Move project to poetry
-- Add CD to PYPI for auto releases
-
-### Donation
-
-If this lib helped you achieve profits will be glad to receive some donation to continue support 💪
-
-ERC20(CRO,USDT,ETH etc.): **0x348c268A563b0C809e4E21F4371E8cdFbD1f51bf**
-
-BTC: **3NxnzUbTDFrwCEChS4PMqXbxvESxkfU2UP**
-
-LTC: **MK3DtnQaMs2eSDdTygF618xdQd7Q9y7Nr2**
-
-NEO: **AdTApXpKjVh2YJUKuEHuWvoSdaSAzLakFF**
-
