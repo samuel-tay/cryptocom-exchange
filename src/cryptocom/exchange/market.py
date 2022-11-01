@@ -73,7 +73,7 @@ class Exchange:
         return [MarketTrade.from_api(pair, trade) for trade in reversed(data)]
 
     async def get_orderbook(self, pair: Pair) -> OrderBook:
-        """Get the order book for a particular market, depth always 150."""
+        """Get the order book for a particular market, depth always 50."""
         data = await self.api.get(
             "public/get-book", {"instrument_name": pair.name}
         )
