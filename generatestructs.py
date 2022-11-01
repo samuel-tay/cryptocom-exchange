@@ -16,7 +16,7 @@ SRC_PATH = Path(__file__).parent / "src" / "cryptocom" / "exchange"
 async def main():
     exchange = cro.Exchange()
     account = cro.Account(from_env=True)
-    coins = (await account.get_balance()).keys()
+    coins = await account.get_currency_types()
     pairs = await exchange.get_pairs()
     networks = await account.get_currency_networks()
 
@@ -52,10 +52,8 @@ async def main():
         ] + [
             f'{network.name}_NETWORK = Network("{network.exchange_name}")\n'
             for network in sorted(networks, key=lambda c: c.name)
-        ] + [
-            "\n",
-            ALL_TEMPLATE.format(class_name='Network')
-        ])
+        ]+ ["\n", ALL_TEMPLATE.format("Network")]
+        )
 
 
 if __name__ == "__main__":

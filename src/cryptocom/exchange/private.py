@@ -439,7 +439,20 @@ class Account:
                 i
             ) for i in all_networks
         ]
-
+    async def get_currency_types(self) -> List[Network]:
+        """Get the currency symbols."""
+        data = await self.api.post('private/get-currency-networks', {
+            'params': {}
+        })
+        all_coins = []
+        currency_map = data['currency_map']
+        for currency in currency_map.keys():
+            all_coins.append(currency)
+        return [
+            Coin(
+                i
+            ) for i in all_coins
+        ]
 
 
     async def create_withdrawal(
