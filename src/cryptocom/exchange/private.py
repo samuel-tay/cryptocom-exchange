@@ -451,7 +451,7 @@ class Account:
                 i
             ) for i in all_networks
         ]
-    async def get_currency_types(self) -> List[Network]:
+    async def get_currency_types(self) -> List[Coin]:
         """Get the currency symbols."""
         data = await self.api.post('private/get-currency-networks', {
             'params': {}
@@ -480,6 +480,8 @@ class Account:
             data['client_wid'] = str(client_wid)
         if address_tag:
             data['address_tag'] = str(address_tag)
+        if network_id:
+            data['network_id'] = str(network_id)
 
         resp = await self.api.post('private/create-withdrawal', {'params': data})
         return int(resp['id'])
