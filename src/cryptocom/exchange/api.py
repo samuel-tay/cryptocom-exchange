@@ -243,6 +243,13 @@ class ApiProvider:
                     continue
                 return result
 
+            if resp_json["code"] == 10010:
+                raise ApiError(
+                    f"Error "
+                    f"Code: {resp.status_code}. Json: {resp_json}. "
+                    f"Data: {data}"
+                )
+
             if count == self.retries:
                 raise ApiError(
                     f"System error, retries: {self.retries}. "
