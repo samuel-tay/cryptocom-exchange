@@ -15,11 +15,9 @@ SRC_PATH = Path(__file__).parent / "src" / "cryptocom" / "exchange"
 
 async def main():
     exchange = cro.Exchange()
-    coins = set()
+    account = cro.Account(from_env=True)
+    coins = await account.get_currency_types()
     pairs = await exchange.get_pairs()
-    for pair in pairs:
-        coins.add(pair.base_coin)
-        coins.add(pair.quote_coin)
     networks = await account.get_currency_networks()
 
     with (SRC_PATH / "pairs.py").open("w") as f:
@@ -54,10 +52,8 @@ async def main():
         ] + [
             f'{network.name}_NETWORK = Network("{network.exchange_name}")\n'
             for network in sorted(networks, key=lambda c: c.name)
-        ] + [
-            "\n",
-            ALL_TEMPLATE.format(class_name='Network')
-        ])
+        ]+ ["\n", ALL_TEMPLATE.format("Network")]
+        )
 
 
 if __name__ == "__main__":
