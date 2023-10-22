@@ -348,22 +348,22 @@ class Order:
         ]
 
         return cls(
-            id=int(data['order_id']),
-            status=OrderStatus(data['status']),
-            side=OrderSide(data['side']),
-            price=pair.round_price(data['limit_price'] or data['avg_price']),
-            quantity=pair.round_quantity(data['quantity']),
-            client_id=data['client_oid'],
-            created_at=int(data['create_time'] / 1000),
-            updated_at=int(data['update_time'] / 1000),
-            type=OrderType(data['order_type']),
+            id=int(data["order_id"]),
+            status=OrderStatus(data["status"]),
+            side=OrderSide(data["side"]),
+            price=pair.round_price(data["avg_price"] or data["limit_price"]),
+            quantity=pair.round_quantity(data["quantity"]),
+            client_id=data["client_oid"],
+            created_at=int(data["create_time"] / 1000),
+            updated_at=int(data["update_time"] / 1000),
+            type=OrderType(data["order_type"]),
             pair=pair,
-            filled_price=pair.round_price(data['avg_price']),
-            filled_quantity=pair.round_quantity(data['cumulative_quantity']),
+            filled_price=pair.round_price(data["avg_price"]),
+            filled_quantity=pair.round_quantity(data["cumulative_quantity"]),
             fees_coin=fees_coin,
-            force_type=OrderForceType(data['time_in_force']),
+            force_type=OrderForceType(data["time_in_force"]),
             trigger_price=trigger_price,
-            trades=trades
+            trades=trades,
         )
 
 
