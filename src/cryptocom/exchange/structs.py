@@ -192,10 +192,10 @@ class Balance:
     @classmethod
     def from_api(cls, data):
         return cls(
-            total=data['quantity'],
-            available=data['max_withdrawal_balance'],
-            in_orders=data['reserved_qty'],
-            collateral_amount=data['collateral_amount'],
+            total=float(data['quantity']),
+            available=float(data['max_withdrawal_balance']),
+            in_orders=float(data['reserved_qty']),
+            collateral_amount=float(data['collateral_amount']),
             coin=Coin(data['instrument_name'])
         )
 
