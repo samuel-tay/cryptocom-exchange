@@ -27,13 +27,13 @@ class Account:
     """Provides access to account actions and data. Balance, trades, orders."""
 
     def __init__(
-        self,
-        *,
-        api_key: str = "",
-        api_secret: str = "",
-        from_env: bool = False,
-        exchange: Exchange = None,
-        api: ApiProvider = None,
+            self,
+            *,
+            api_key: str = "",
+            api_secret: str = "",
+            from_env: bool = False,
+            exchange: Exchange = None,
+            api: ApiProvider = None,
     ):
         if not api and not (api_key and api_secret) and not from_env:
             raise ValueError(
@@ -51,20 +51,20 @@ class Account:
 
     async def get_balance(self) -> Dict[Coin, Balance]:
         """Return balance."""
-        data = await self.api.post("private/get-account-summary")
+        data = await self.api.post('private/user-balance')
         return {
-            Coin(bal["currency"]): Balance.from_api(bal)
-            for bal in data["accounts"]
+            Coin(bal['instrument_name']): Balance.from_api(bal)
+            for bal in data[0]['position_balances']
         }
 
     async def get_deposit_history(
-        self,
-        coin: Coin,
-        start_ts: int = None,
-        end_ts: int = None,
-        status: DepositStatus = None,
-        page: int = 0,
-        page_size: int = 20,
+            self,
+            coin: Coin,
+            start_ts: int = None,
+            end_ts: int = None,
+            status: DepositStatus = None,
+            page: int = 0,
+            page_size: int = 20,
     ) -> List[Deposit]:
         """Return all history withdrawals."""
         params = {"page_size": page_size, "page": page}
@@ -78,10 +78,10 @@ class Account:
             params["status"] = status
 
         data = (
-            await self.api.post(
-                "private/get-deposit-history", {"params": params}
-            )
-            or {}
+                await self.api.post(
+                    "private/get-deposit-history", {"params": params}
+                )
+                or {}
         )
         return [
             Deposit.create_from_api(trx)
@@ -89,13 +89,13 @@ class Account:
         ]
 
     async def get_withdrawal_history(
-        self,
-        coin: Coin,
-        start_ts: int = None,
-        end_ts: int = None,
-        status: WithdrawalStatus = None,
-        page: int = 0,
-        page_size: int = 20,
+            self,
+            coin: Coin,
+            start_ts: int = None,
+            end_ts: int = None,
+            status: WithdrawalStatus = None,
+            page: int = 0,
+            page_size: int = 20,
     ) -> List[Withdrawal]:
         """Return all history for withdrawal transactions."""
         params = {"page_size": page_size, "page": page}
@@ -109,10 +109,10 @@ class Account:
             params["status"] = status
 
         data = (
-            await self.api.post(
-                "private/get-withdrawal-history", {"params": params}
-            )
-            or {}
+                await self.api.post(
+                    "private/get-withdrawal-history", {"params": params}
+                )
+                or {}
         )
         return [
             Withdrawal.create_from_api(trx)
@@ -120,12 +120,12 @@ class Account:
         ]
 
     async def get_interest_history(
-        self,
-        coin: Coin,
-        start_ts: int = None,
-        end_ts: int = None,
-        page: int = 0,
-        page_size: int = 20,
+            self,
+            coin: Coin,
+            start_ts: int = None,
+            end_ts: int = None,
+            page: int = 0,
+            page_size: int = 20,
     ) -> List[Interest]:
         """Return all history interest."""
         params = {"page_size": page_size, "page": page}
@@ -137,10 +137,10 @@ class Account:
             params["end_ts"] = int(end_ts) * 1000
 
         data = (
-            await self.api.post(
-                "private/margin/get-order-history", {"params": params}
-            )
-            or {}
+                await self.api.post(
+                    "private/margin/get-order-history", {"params": params}
+                )
+                or {}
         )
         return [
             Interest.create_from_api(interest)
@@ -148,12 +148,12 @@ class Account:
         ]
 
     async def get_orders_history(
-        self,
-        pair: Pair = None,
-        start_ts: int = None,
-        end_ts: int = None,
-        page: int = 0,
-        page_size: int = 200,
+            self,
+            pair: Pair = None,
+            start_ts: int = None,
+            end_ts: int = None,
+            page: int = 0,
+            page_size: int = 200,
     ) -> List[Order]:
         """Return all history orders."""
         params = {"page_size": page_size, "page": page}
@@ -165,10 +165,10 @@ class Account:
             params["end_ts"] = int(end_ts) * 1000
 
         data = (
-            await self.api.post(
-                "private/get-order-history", {"params": params}
-            )
-            or {}
+                await self.api.post(
+                    "private/get-order-history", {"params": params}
+                )
+                or {}
         )
         return [
             Order.create_from_api(self.pairs[order["instrument_name"]], order)
@@ -176,36 +176,36 @@ class Account:
         ]
 
     async def get_open_orders(
-        self, pair: Pair = None, page: int = 0, page_size: int = 200
+            self, pair: Pair = None
     ) -> List[Order]:
         """Return open orders."""
-        params = {"page_size": page_size, "page": page}
+        params = {}
         if pair:
             params["instrument_name"] = pair.name
         data = await self.api.post(
             "private/get-open-orders", {"params": params}
         )
+        if len(data['data']) == 0:
+            return []
         return [
             Order.create_from_api(self.pairs[order["instrument_name"]], order)
             for order in data.get("order_list") or []
         ]
 
     async def get_trades(
-        self,
-        pair: Pair = None,
-        start_ts: int = None,
-        end_ts: int = None,
-        page: int = 0,
-        page_size: int = 200,
+            self,
+            pair: Pair = None,
+            start_ts: int = None,
+            end_ts: int = None,
     ) -> List[PrivateTrade]:
         """Return trades."""
-        params = {"page_size": page_size, "page": page}
+        params = {}
         if pair:
             params["instrument_name"] = pair.name
         if start_ts:
-            params["start_ts"] = int(start_ts) * 1000
+            params["start_time"] = int(start_ts) * 1000
         if end_ts:
-            params["end_ts"] = int(end_ts) * 1000
+            params["end_time"] = int(end_ts) * 1000
         data = await self.api.post("private/get-trades", {"params": params})
         return [
             PrivateTrade.create_from_api(
@@ -215,15 +215,15 @@ class Account:
         ]
 
     async def create_order(
-        self,
-        pair: Pair,
-        side: OrderSide,
-        type_: OrderType,
-        quantity: float,
-        price: float = 0,
-        force_type: OrderForceType = None,
-        exec_type: OrderExecType = None,
-        client_id: int = None,
+            self,
+            pair: Pair,
+            side: OrderSide,
+            type_: OrderType,
+            quantity: float,
+            price: float = 0,
+            force_type: OrderForceType = None,
+            exec_type: OrderExecType = None,
+            client_id: int = None,
     ) -> int:
         """Create raw order with buy or sell side."""
         data = {
@@ -264,13 +264,13 @@ class Account:
         return int(resp["order_id"])
 
     async def buy_limit(
-        self,
-        pair: Pair,
-        quantity: float,
-        price: float,
-        force_type: OrderForceType = None,
-        exec_type: OrderExecType = None,
-        client_id: int = None,
+            self,
+            pair: Pair,
+            quantity: float,
+            price: float,
+            force_type: OrderForceType = None,
+            exec_type: OrderExecType = None,
+            client_id: int = None,
     ) -> int:
         """Buy limit order."""
         return await self.create_order(
@@ -285,13 +285,13 @@ class Account:
         )
 
     async def sell_limit(
-        self,
-        pair: Pair,
-        quantity: float,
-        price: float,
-        force_type: OrderForceType = None,
-        exec_type: OrderExecType = None,
-        client_id: int = None,
+            self,
+            pair: Pair,
+            quantity: float,
+            price: float,
+            force_type: OrderForceType = None,
+            exec_type: OrderExecType = None,
+            client_id: int = None,
     ) -> int:
         """Sell limit order."""
         return await self.create_order(
@@ -306,7 +306,7 @@ class Account:
         )
 
     async def wait_for_status(
-        self, order_id: int, statuses, delay: int = 0.1
+            self, order_id: int, statuses, delay: int = 0.1
     ) -> None:
         """Wait for order status."""
         order = await self.get_order(order_id)
@@ -324,7 +324,7 @@ class Account:
             )
 
     async def buy_market(
-        self, pair: Pair, spend: float, wait_for_fill=False
+            self, pair: Pair, spend: float, wait_for_fill=False
     ) -> int:
         """Buy market order."""
         order_id = await self.create_order(
@@ -344,7 +344,7 @@ class Account:
         return order_id
 
     async def sell_market(
-        self, pair: Pair, quantity: float, wait_for_fill=False
+            self, pair: Pair, quantity: float, wait_for_fill=False
     ) -> int:
         """Sell market order."""
         order_id = await self.create_order(
@@ -391,7 +391,7 @@ class Account:
         )
 
     async def cancel_order(
-        self, order_id: int, pair: Pair, check_status=False
+            self, order_id: int, pair: Pair, check_status=False
     ) -> None:
         """Cancel order."""
         await self.api.post(
@@ -427,13 +427,12 @@ class Account:
 
     async def listen_orders(self, pair: Pair) -> Order:
         async for data in self.api.listen(
-            "user", f"user.order.{pair.name}", sign=True
+                "user", f"user.order.{pair.name}", sign=True
         ):
             for order in data.get("data", []):
                 yield Order.create_from_api(
                     self.pairs[data["instrument_name"]], order
                 )
-
 
     async def get_currency_networks(self) -> List[Network]:
         """Get the symbol network mapping."""
@@ -451,6 +450,7 @@ class Account:
                 i
             ) for i in all_networks
         ]
+
     async def get_currency_types(self) -> List[Coin]:
         """Get the currency symbols."""
         data = await self.api.post('private/get-currency-networks', {
@@ -465,7 +465,6 @@ class Account:
                 i
             ) for i in all_coins
         ]
-
 
     async def create_withdrawal(
             self, coin: Coin, quantity: str, address: str, client_wid: str = None, address_tag: str = None,

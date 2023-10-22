@@ -186,17 +186,17 @@ class Balance:
     total: float
     available: float
     in_orders: float
-    in_stake: float
+    collateral_amount: float
     coin: Coin
 
     @classmethod
     def from_api(cls, data):
         return cls(
-            total=data["balance"],
-            available=data["available"],
-            in_orders=data["order"],
-            in_stake=data["stake"],
-            coin=Coin(data["currency"]),
+            total=data['quantity'],
+            available=data['max_withdrawal_balance'],
+            in_orders=data['reserved_qty'],
+            collateral_amount=data['collateral_amount'],
+            coin=Coin(data['instrument_name'])
         )
 
 
@@ -256,7 +256,7 @@ class PrivateTrade:
             side=OrderSide(data["side"]),
             pair=pair,
             fees=round_up(data["fee"], 8),
-            fees_coin=Coin(data["fee_currency"]),
+            fees_coin=Coin(data["fee_instrument_name"]),
             created_at=int(data["create_time"] / 1000),
             filled_price=pair.round_price(data["traded_price"]),
             filled_quantity=pair.round_quantity(data["traded_quantity"]),
@@ -338,8 +338,8 @@ class Order:
         cls, pair: Pair, data: Dict, trades: List[Dict] = None
     ) -> "Order":
         fees_coin, trigger_price = None, None
-        if data["fee_currency"]:
-            fees_coin = Coin(data["fee_currency"])
+        if data["fee_instrument_name"]:
+            fees_coin = Coin(data["fee_instrument_name"])
         if data.get("trigger_price") is not None:
             trigger_price = pair.round_price(data["trigger_price"])
 
@@ -348,22 +348,22 @@ class Order:
         ]
 
         return cls(
-            id=int(data["order_id"]),
-            status=OrderStatus(data["status"]),
-            side=OrderSide(data["side"]),
-            price=pair.round_price(data["avg_price"] or data["price"]),
-            quantity=pair.round_quantity(data["quantity"]),
-            client_id=data["client_oid"],
-            created_at=int(data["create_time"] / 1000),
-            updated_at=int(data["update_time"] / 1000),
-            type=OrderType(data["type"]),
+            id=int(data['order_id']),
+            status=OrderStatus(data['status']),
+            side=OrderSide(data['side']),
+            price=pair.round_price(data['limit_price'] or data['avg_price']),
+            quantity=pair.round_quantity(data['quantity']),
+            client_id=data['client_oid'],
+            created_at=int(data['create_time'] / 1000),
+            updated_at=int(data['update_time'] / 1000),
+            type=OrderType(data['order_type']),
             pair=pair,
-            filled_price=pair.round_price(data["avg_price"]),
-            filled_quantity=pair.round_quantity(data["cumulative_quantity"]),
+            filled_price=pair.round_price(data['avg_price']),
+            filled_quantity=pair.round_quantity(data['cumulative_quantity']),
             fees_coin=fees_coin,
-            force_type=OrderForceType(data["time_in_force"]),
+            force_type=OrderForceType(data['time_in_force']),
             trigger_price=trigger_price,
-            trades=trades,
+            trades=trades
         )
 
 
