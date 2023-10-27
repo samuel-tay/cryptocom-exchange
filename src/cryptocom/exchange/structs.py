@@ -281,7 +281,6 @@ class Order:
     fees_coin: Coin
     force_type: OrderForceType
     trigger_price: float
-    trades: List[PrivateTrade]
 
     @cached_property
     def is_buy(self):
@@ -335,7 +334,7 @@ class Order:
 
     @classmethod
     def create_from_api(
-        cls, pair: Pair, data: Dict, trades: List[Dict] = None
+        cls, pair: Pair, data: Dict
     ) -> "Order":
         fees_coin, trigger_price = None, None
         if data["fee_instrument_name"]:
@@ -343,27 +342,22 @@ class Order:
         if data.get("trigger_price") is not None:
             trigger_price = pair.round_price(data["trigger_price"])
 
-        trades = [
-            PrivateTrade.create_from_api(pair, trade) for trade in trades or []
-        ]
-
         return cls(
             id=int(data["order_id"]),
             status=OrderStatus(data["status"]),
             side=OrderSide(data["side"]),
-            price=pair.round_price(data["avg_price"] or data["limit_price"]),
+            price=pair.round_price(data["avg_price"] or data["price"]),
             quantity=pair.round_quantity(data["quantity"]),
             client_id=data["client_oid"],
             created_at=int(data["create_time"] / 1000),
             updated_at=int(data["update_time"] / 1000),
             type=OrderType(data["order_type"]),
             pair=pair,
+            fees_coin=fees_coin,
             filled_price=pair.round_price(data["avg_price"]),
             filled_quantity=pair.round_quantity(data["cumulative_quantity"]),
-            fees_coin=fees_coin,
             force_type=OrderForceType(data["time_in_force"]),
             trigger_price=trigger_price,
-            trades=trades,
         )
 
 
