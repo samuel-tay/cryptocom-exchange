@@ -216,6 +216,12 @@ class ApiProvider:
                         headers={"content-type": "application/json"},
                     )
                     resp_json = resp.json()
+                    if resp.status_code == 500:
+                        raise ApiError(
+                            f"Error "
+                            f"Code: {resp.status_code}. Json: {resp_json}. "
+                            f"Data: {data}"
+                        )
                     if resp.status_code != 200:
                         if count != self.retries:
                             continue
