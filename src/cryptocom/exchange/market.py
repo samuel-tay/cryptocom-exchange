@@ -36,11 +36,11 @@ class Exchange:
         data = await self.api.get("public/get-instruments")
         return [
             Pair(
-                i["symbol"],
-                price_precision=i["quote_decimals"],
-                quantity_precision=i["quantity_decimals"],
+                i['symbol'],
+                price_precision=i['quote_decimals'],
+                quantity_precision=i['quantity_decimals'],
             )
-            for i in data["instruments"]
+            for i in data
         ]
 
     async def get_ticker(self, pair: Pair) -> MarketTicker:
