@@ -36,23 +36,23 @@ class Exchange:
         data = await self.api.get("public/get-instruments")
         return [
             Pair(
-                i["instrument_name"],
-                price_precision=i["price_decimals"],
-                quantity_precision=i["quantity_decimals"],
+                i['symbol'],
+                price_precision=i['quote_decimals'],
+                quantity_precision=i['quantity_decimals'],
             )
-            for i in data["instruments"]
+            for i in data
         ]
 
     async def get_ticker(self, pair: Pair) -> MarketTicker:
         """Get ticker in for provided pair."""
         data = await self.api.get(
-            "public/get-ticker", {"instrument_name": pair.name}
+            "public/get-tickers", {"instrument_name": pair.name}
         )
         return MarketTicker.from_api(pair, data[0])
 
     async def get_tickers(self) -> Dict[Pair, MarketTicker]:
         """Get tickers in all available markets."""
-        data = await self.api.get("public/get-ticker")
+        data = await self.api.get("public/get-tickers")
         return {
             self.pairs[ticker["i"]]: MarketTicker.from_api(
                 self.pairs[ticker["i"]], ticker
@@ -95,17 +95,23 @@ class Exchange:
         return [Candle.from_api(pair, candle) for candle in data]
 
     async def listen_candles(
-        self, period: Period, *pairs: List[Pair]
-    ) -> AsyncGenerator[Candle, None]:
+            self, period: Period, *pairs: List[Pair]) -> Candle:
         if not isinstance(period, Period):
-            raise ValueError(f"Provide Period enum not {period}")
+            raise ValueError(f'Provide Period enum not {period}')
 
-        channels = [f"candlestick.{period}.{pair.name}" for pair in pairs]
+        channels = [
+            f'candlestick.{period}.{pair.name}'
+            for pair in pairs
+        ]
+        prev_time = {}
 
-        async for data in self.api.listen("market", *channels):
-            pair = self.pairs[data["instrument_name"]]
-            for candle in data["data"]:
-                yield Candle.from_api(pair, candle)
+        async for data in self.api.listen('market', *channels):
+            pair = self.pairs[data['instrument_name']]
+            for candle in data['data']:
+                current_time = int(candle['t'] / 1000)
+                if pair not in prev_time or current_time > prev_time[pair]:
+                    yield Candle.from_api(pair, candle)
+                    prev_time[pair] = current_time
 
     async def listen_trades(self, *pairs: List[Pair]) -> MarketTrade:
         channels = [f"trade.{pair.name}" for pair in pairs]
