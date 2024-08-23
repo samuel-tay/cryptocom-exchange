@@ -120,8 +120,8 @@ class ApiProvider:
         auth_required=True,
         timeout=5,
         retries=6,
-        root_url="https://api.crypto.com/v2/",
-        ws_root_url="wss://stream.crypto.com/v2/",
+        root_url="https://api.crypto.com/exchange/v1/",
+        ws_root_url="wss://stream.crypto.com/exchange/v1/",
         logger=None,
     ):
         self.ssl_context = httpx.create_ssl_context()
@@ -216,6 +216,12 @@ class ApiProvider:
                         headers={"content-type": "application/json"},
                     )
                     resp_json = resp.json()
+                    if resp.status_code == 500:
+                        raise ApiError(
+                            f"Error "
+                            f"Code: {resp.status_code}. Json: {resp_json}. "
+                            f"Data: {data}"
+                        )
                     if resp.status_code != 200:
                         if count != self.retries:
                             continue

@@ -186,17 +186,17 @@ class Balance:
     total: float
     available: float
     in_orders: float
-    in_stake: float
+    collateral_amount: float
     coin: Coin
 
     @classmethod
     def from_api(cls, data):
         return cls(
-            total=data["balance"],
-            available=data["available"],
-            in_orders=data["order"],
-            in_stake=data["stake"],
-            coin=Coin(data["currency"]),
+            total=float(data['quantity']),
+            available=float(data['max_withdrawal_balance']),
+            in_orders=float(data['reserved_qty']),
+            collateral_amount=float(data['collateral_amount']),
+            coin=Coin(data['instrument_name'])
         )
 
 
@@ -256,7 +256,7 @@ class PrivateTrade:
             side=OrderSide(data["side"]),
             pair=pair,
             fees=round_up(data["fee"], 8),
-            fees_coin=Coin(data["fee_currency"]),
+            fees_coin=Coin(data["fee_instrument_name"]),
             created_at=int(data["create_time"] / 1000),
             filled_price=pair.round_price(data["traded_price"]),
             filled_quantity=pair.round_quantity(data["traded_quantity"]),
@@ -281,7 +281,6 @@ class Order:
     fees_coin: Coin
     force_type: OrderForceType
     trigger_price: float
-    trades: List[PrivateTrade]
 
     @cached_property
     def is_buy(self):
@@ -335,17 +334,13 @@ class Order:
 
     @classmethod
     def create_from_api(
-        cls, pair: Pair, data: Dict, trades: List[Dict] = None
+        cls, pair: Pair, data: Dict
     ) -> "Order":
         fees_coin, trigger_price = None, None
-        if data["fee_currency"]:
-            fees_coin = Coin(data["fee_currency"])
+        if data["fee_instrument_name"]:
+            fees_coin = Coin(data["fee_instrument_name"])
         if data.get("trigger_price") is not None:
             trigger_price = pair.round_price(data["trigger_price"])
-
-        trades = [
-            PrivateTrade.create_from_api(pair, trade) for trade in trades or []
-        ]
 
         return cls(
             id=int(data["order_id"]),
@@ -356,14 +351,13 @@ class Order:
             client_id=data["client_oid"],
             created_at=int(data["create_time"] / 1000),
             updated_at=int(data["update_time"] / 1000),
-            type=OrderType(data["type"]),
+            type=OrderType(data["order_type"]),
             pair=pair,
+            fees_coin=fees_coin,
             filled_price=pair.round_price(data["avg_price"]),
             filled_quantity=pair.round_quantity(data["cumulative_quantity"]),
-            fees_coin=fees_coin,
             force_type=OrderForceType(data["time_in_force"]),
             trigger_price=trigger_price,
-            trades=trades,
         )
 
 
