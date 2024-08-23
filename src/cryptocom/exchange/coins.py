@@ -1,5 +1,6 @@
 from .structs import Coin
 
+LOAF =  Coin("LOAF")
 AAVE = Coin("AAVE")
 ACA = Coin("ACA")
 ACH = Coin("ACH")
@@ -42,6 +43,7 @@ BOBA = Coin("BOBA")
 BOND = Coin("BOND")
 BOSON = Coin("BOSON")
 BTC = Coin("BTC")
+CROB = Coin("CROB")
 C98 = Coin("C98")
 CELR = Coin("CELR")
 CHESS = Coin("CHESS")
